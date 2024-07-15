@@ -50,6 +50,14 @@ public class GeofenceService extends Service implements GeofenceServiceInterface
 
         geofencingClient = LocationServices.getGeofencingClient(this);
         addGeofence();
+
+        // Register the BroadcastReceiver
+        IntentFilter filter = new IntentFilter("GEOFENCE_TRANSITION_ACTION");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ContextCompat.registerReceiver(this, mGeofenceReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(mGeofenceReceiver, filter);
+        }
     }
 
     @Override
@@ -79,6 +87,9 @@ public class GeofenceService extends Service implements GeofenceServiceInterface
     @Override
     public void onDestroy() {
         super.onDestroy();
+        
+        // Unregister the BroadcastReceiver
+        unregisterReceiver(mGeofenceReceiver);
     }
 
     public class MyBinder extends Binder {
